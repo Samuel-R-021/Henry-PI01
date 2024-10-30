@@ -10,10 +10,10 @@ func_dataset = pd.read_csv('full_funciones_dataset.csv')
 #     indice = func_dataset.index[func_dataset['title']== mes][0]
 #     return f"La película {func_dataset['title'][indice]} fue estrenada en el año {func_dataset['release_year'][indice]} con un score/popularidad de {func_dataset['popularity'][indice]}"
 
-# @app.get("/cantidad_filmaciones_dia/")
-# async def cantidad_filmaciones_dia(dia: str = ''):
-#     indice = func_dataset.index[func_dataset['title']== dia][0]
-#     return f"La película {func_dataset['title'][indice]} fue estrenada en el año {func_dataset['release_year'][indice]} con un score/popularidad de {func_dataset['popularity'][indice]}"
+@app.get("/cantidad_filmaciones_dia/")
+async def cantidad_filmaciones_dia(dia: str = ''):
+    total = func_dataset['day_name'][func_dataset['day_name']== dia.capitalize()].count()
+    return f'{total} cantidad de películas fueron estrenadas en los días {dia.lower()}'
 
 @app.get("/score_titulo/")
 async def score_titulo(title: str = ''):
