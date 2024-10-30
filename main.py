@@ -5,10 +5,10 @@ app = FastAPI()
 
 func_dataset = pd.read_csv('full_funciones_dataset.csv', index_col='lowercase_title')
 
-# @app.get("/cantidad_filmaciones_mes/")
-# async def cantidad_filmaciones_mes(mes: str = ''):
-#     indice = func_dataset.index[func_dataset['title']== mes][0]
-#     return f"La película {func_dataset['title'][indice]} fue estrenada en el año {func_dataset['release_year'][indice]} con un score/popularidad de {func_dataset['popularity'][indice]}"
+@app.get("/cantidad_filmaciones_mes/")
+async def cantidad_filmaciones_mes(mes: str = ''):
+    total = func_dataset['month_name'][func_dataset['month_name']== mes.capitalize()].count()
+    return f'{total} películas fueron estrenadas en el mes de {mes.lower()}'
 
 @app.get("/cantidad_filmaciones_dia/")
 async def cantidad_filmaciones_dia(dia: str = ''):
