@@ -13,7 +13,9 @@ func_dataset = pd.read_csv('full_funciones_dataset.csv', index_col='lowercase_ti
 @app.get("/cantidad_filmaciones_dia/")
 async def cantidad_filmaciones_dia(dia: str = ''):
     if dia.lower() == 'miercoles':
-        dia = 'miércoles' 
+        dia = 'miércoles'
+    elif dia.lower() == 'sabado':
+        dia = 'sábado'
     total = func_dataset['day_name'][func_dataset['day_name']== dia.capitalize()].count()
     return f'{total} películas fueron estrenadas en los días {dia.lower()}'
 
