@@ -3,10 +3,24 @@ import pandas as pd
 
 app = FastAPI()
 
-popularity_test = pd.read_csv('popularity_test.csv')
+func_dataset = pd.read_csv('full_funciones_dataset.csv')
+
+# @app.get("/cantidad_filmaciones_mes/")
+# async def cantidad_filmaciones_mes(mes: str = ''):
+#     indice = func_dataset.index[func_dataset['title']== mes][0]
+#     return f"La película {func_dataset['title'][indice]} fue estrenada en el año {func_dataset['release_year'][indice]} con un score/popularidad de {func_dataset['popularity'][indice]}"
+
+# @app.get("/cantidad_filmaciones_dia/")
+# async def cantidad_filmaciones_dia(dia: str = ''):
+#     indice = func_dataset.index[func_dataset['title']== dia][0]
+#     return f"La película {func_dataset['title'][indice]} fue estrenada en el año {func_dataset['release_year'][indice]} con un score/popularidad de {func_dataset['popularity'][indice]}"
 
 @app.get("/score_titulo/")
 async def score_titulo(title: str = ''):
-    indice = popularity_test.index[popularity_test['title']== title][0]
-    return f"La película {popularity_test['title'][indice]} fue estrenada en el año {popularity_test['release_year'][indice]} con un score/popularidad de {popularity_test['popularity'][indice]}"
+    indice = func_dataset.index[func_dataset['title']== title][0]  # El index da una tupla, donde el primer valor es el indice y el segungo el tipo de dato
+    return f"La película {func_dataset['title'][indice]} fue estrenada en el año {func_dataset['release_year'][indice]} con un score/popularidad de {func_dataset['popularity'][indice]}"
     
+@app.get("/votos_titulo/")
+async def votos_titulo(title: str = ''):
+    indice = func_dataset.index[func_dataset['title']== title][0]
+    return f"La película {func_dataset['title'][indice]} fue estrenada en el año {func_dataset['release_year'][indice]}."
