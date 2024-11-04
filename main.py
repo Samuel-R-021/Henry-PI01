@@ -4,6 +4,8 @@ import pandas as pd
 app = FastAPI()
 
 func_1_4_dataset = pd.read_csv('funciones_1_4_dataset.csv', index_col='lowercase_title')
+func_5_6_dataset = pd.read_csv('funciones_5_6_dataset.csv', index_col='id')
+cast_dataset = pd.read_csv('cast_credits.csv',index_col='lowercase_name')
 
 @app.get("/cantidad_filmaciones_mes/")
 async def cantidad_filmaciones_mes(mes: str = ''):
@@ -31,8 +33,21 @@ async def votos_titulo(titulo_de_la_filmacion: str = ''):
 
 @app.get("/get_actor/")
 async def get_actor(nombre_actor: str = ''):
+    
+    # convertir a minuscula para evitar errores, y usar como indice en el cast_dataset
     indice = nombre_actor.lower()
-    return f"La película {func_1_4_dataset['title'][indice]} tiene menos de 2000 valoraciones, por lo que no se devuelve ningun valor." if func_1_4_dataset['vote_count'][indice] < 2000 else f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]}. La misma cuenta con un total de {int(func_1_4_dataset['vote_count'][indice])} valoraciones, con un promedio de {func_1_4_dataset['vote_average'][indice]}"
+    
+
+    # aqui tomamos los id sacados de cast_dataset y buscamos cuales se encuentran en el dataset de movies (func_5_6_dataset)
+    # y nos quedamos solo con los que SI estan en el datasets de movies.
+    movies_cast_id_match = func_5_6_dataset['id'].isin(cast_dataset['id'][indice])
+
+    # valores a extraer para el resultado de la funcion
+    nombre = cast_dataset['name'][indice][0]
+    filmaciones = func_5_6_dataset['id'][movies_cast_id_match].shape[0]
+    retorno = func_5_6_dataset['return'][movies_cast_id_match].sum()
+    promedio = retorno/filmaciones
+    return f"El actor {nombre} ha participado en {filmaciones} filmaciones, el mismo ha conseguido un retorno de {round(retorno,ndigits=2)} con un promedio de {round(promedio, ndigits=2)} por filmacion."
 
 @app.get("/get_director/")
 async def get_director(nombre_director: str = ''):
