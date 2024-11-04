@@ -6,6 +6,7 @@ app = FastAPI()
 func_1_4_dataset = pd.read_csv('funciones_1_4_dataset.csv', index_col='lowercase_title')
 func_5_6_dataset = pd.read_csv('funciones_5_6_dataset.csv')
 cast_dataset = pd.read_csv('cast_credits.csv',index_col='lowercase_name')
+crew_dataset = pd.read_csv('crew_credits.csv',index_col='lowercase_name')
 
 @app.get("/cantidad_filmaciones_mes/")
 async def cantidad_filmaciones_mes(mes: str = ''):
@@ -50,7 +51,14 @@ async def get_actor(nombre_actor: str = ''):
     return f"El actor {nombre} ha participado en {filmaciones} filmaciones, el mismo ha conseguido un retorno de {round(retorno,ndigits=2)} con un promedio de {round(promedio, ndigits=2)} por filmacion."
 
 @app.get("/get_director/")
-async def get_director(nombre_director: str = ''):
-    indice = nombre_director.lower()
-    return f"La película {func_1_4_dataset['title'][indice]} tiene menos de 2000 valoraciones, por lo que no se devuelve ningun valor." if func_1_4_dataset['vote_count'][indice] < 2000 else f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]}. La misma cuenta con un total de {int(func_1_4_dataset['vote_count'][indice])} valoraciones, con un promedio de {func_1_4_dataset['vote_average'][indice]}"
+async def get_director(nombre_actor: str = ''):
+    indice = nombre_actor.lower()
+    
+    movies_crew_id_match = func_5_6_dataset['id'].isin(crew_dataset['id'][indice])
+
+    nombre = crew_dataset['name'][indice][0]
+    filmaciones = func_5_6_dataset['id'][movies_crew_id_match]
+    retorno = func_5_6_dataset['return'][movies_crew_id_match].sum()
+    promedio = retorno/filmaciones.shape[0]
+    return f"El director {nombre} ha dirigido {filmaciones.shape[0]} filmaciones, con un retorno total de {round(retorno,ndigits=2)}, siendo un promedio de {round(promedio, ndigits=2)} por filmacion.\n veamos"
 
