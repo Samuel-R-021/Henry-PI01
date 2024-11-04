@@ -20,11 +20,22 @@ async def cantidad_filmaciones_dia(dia: str = ''):
     return f'{total} películas fueron estrenadas en los días {dia.lower()}'
 
 @app.get("/score_titulo/")
-async def score_titulo(title: str = ''):
-    indice = title.lower()
+async def score_titulo(titulo_de_la_filmacion: str = ''):
+    indice = titulo_de_la_filmacion.lower()
     return f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]} con un score/popularidad de {func_1_4_dataset['popularity'][indice]}"
     
 @app.get("/votos_titulo/")
-async def votos_titulo(title: str = ''):
-    indice = title.lower()
-    return f"La película {func_1_4_dataset['title'][indice]} no tiene al menos 2000 valoraciones, por lo que no se devuelve ningun valor." if func_1_4_dataset['vote_count'][indice] < 2000 else f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]}. La misma cuenta con un total de {int(func_1_4_dataset['vote_count'][indice])} valoraciones, con un promedio de {func_1_4_dataset['vote_average'][indice]}"
+async def votos_titulo(titulo_de_la_filmacion: str = ''):
+    indice = titulo_de_la_filmacion.lower()
+    return f"La película {func_1_4_dataset['title'][indice]} tiene menos de 2000 valoraciones, por lo que no se devuelve ningun valor." if func_1_4_dataset['vote_count'][indice] < 2000 else f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]}. La misma cuenta con un total de {int(func_1_4_dataset['vote_count'][indice])} valoraciones, con un promedio de {func_1_4_dataset['vote_average'][indice]}"
+
+@app.get("/get_actor/")
+async def get_actor(nombre_actor: str = ''):
+    indice = nombre_actor.lower()
+    return f"La película {func_1_4_dataset['title'][indice]} tiene menos de 2000 valoraciones, por lo que no se devuelve ningun valor." if func_1_4_dataset['vote_count'][indice] < 2000 else f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]}. La misma cuenta con un total de {int(func_1_4_dataset['vote_count'][indice])} valoraciones, con un promedio de {func_1_4_dataset['vote_average'][indice]}"
+
+@app.get("/get_director/")
+async def get_director(nombre_director: str = ''):
+    indice = nombre_director.lower()
+    return f"La película {func_1_4_dataset['title'][indice]} tiene menos de 2000 valoraciones, por lo que no se devuelve ningun valor." if func_1_4_dataset['vote_count'][indice] < 2000 else f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]}. La misma cuenta con un total de {int(func_1_4_dataset['vote_count'][indice])} valoraciones, con un promedio de {func_1_4_dataset['vote_average'][indice]}"
+
