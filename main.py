@@ -4,7 +4,7 @@ import pandas as pd
 app = FastAPI()
 
 func_1_4_dataset = pd.read_csv('funciones_1_4_dataset.csv', index_col='lowercase_title')
-func_5_6_dataset = pd.read_csv('funciones_5_6_dataset.csv', index_col='id')
+func_5_6_dataset = pd.read_csv('funciones_5_6_dataset.csv')
 cast_dataset = pd.read_csv('cast_credits.csv',index_col='lowercase_name')
 
 @app.get("/cantidad_filmaciones_mes/")
