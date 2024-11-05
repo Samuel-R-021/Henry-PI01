@@ -11,10 +11,6 @@ cast_dataset = pd.read_csv('cast_credits.csv',index_col='lowercase_name')
 crew_dataset = pd.read_csv('crew_credits.csv',index_col='lowercase_name')
 modelo_dataset = pd.read_csv('modelo_database.csv')
 
-# cv = CountVectorizer(max_features=1250, stop_words='english')
-# vector = cv.fit_transform(modelo_dataset['tags']).toarray()
-# similitud = cosine_similarity(vector)
-
 @app.get("/")
 async def root():
     return {"message": "Proyecto Individual 1 DataScience, Samuel Rangel DataPT11"}
@@ -57,6 +53,7 @@ async def get_actor(nombre_actor: str = ''):
     # aqui tomamos los id sacados de cast_dataset y buscamos cuales se encuentran en el dataset de movies (func_5_6_dataset)
     # y nos quedamos solo con los que SI estan en el datasets de movies.
     movies_cast_id_match = func_5_6_dataset['id'].isin(cast_dataset['id'][indice])
+    
     # valores a extraer para el resultado de la funcion
     nombre = cast_dataset['name'][indice][0]
     filmaciones = func_5_6_dataset['id'][movies_cast_id_match].shape[0]
@@ -84,8 +81,5 @@ async def recomendacion(titulo: str = ''):
 
     indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
     distancia = sorted(list(enumerate(similitud[indice])), reverse=True, key=lambda x: x[1])
-
-    # for i in distancia[1:6]:
-    #     print(modelo_dataset.iloc[i[0]].title)
 
     return [modelo_dataset['title'][i[0]] for i in distancia[1:6]]
