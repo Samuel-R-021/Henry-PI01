@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 app = FastAPI()
 
@@ -7,6 +9,11 @@ func_1_4_dataset = pd.read_csv('funciones_1_4_dataset.csv', index_col='lowercase
 func_5_6_dataset = pd.read_csv('funciones_5_6_dataset.csv')
 cast_dataset = pd.read_csv('cast_credits.csv',index_col='lowercase_name')
 crew_dataset = pd.read_csv('crew_credits.csv',index_col='lowercase_name')
+modelo_dataset = pd.read_csv('modelo_database.csv')
+
+cv = CountVectorizer(stop_words='english')
+vector = cv.fit_transform(modelo_dataset['tags']).toarray()
+similitud = cosine_similarity(vector)
 
 @app.get("/cantidad_filmaciones_mes/")
 async def cantidad_filmaciones_mes(mes: str = ''):
@@ -60,5 +67,19 @@ async def get_director(nombre_actor: str = ''):
     filmaciones = func_5_6_dataset['id'][movies_crew_id_match]
     retorno = func_5_6_dataset['return'][movies_crew_id_match].sum()
     promedio = retorno/filmaciones.shape[0]
-    return f"El director {nombre} ha dirigido {filmaciones.shape[0]} filmaciones, con un retorno total de {round(retorno,ndigits=2)}, siendo un promedio de {round(promedio, ndigits=2)} por filmacion.\n veamos"
+    return f"El director {nombre} ha dirigido {filmaciones.shape[0]} filmaciones, con un retorno total de {round(retorno,ndigits=2)}, siendo un promedio de {round(promedio, ndigits=2)} por filmacion."
 
+@app.get("/recomendacion/")
+async def recomendacion(titulo: str = ''):
+    
+    # cv = CountVectorizer(stop_words='english')
+    # vector = cv.fit_transform(modelo_dataset['tags']).toarray()
+    # similitud = cosine_similarity(vector)
+
+    indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
+
+    distancia = sorted(list(enumerate(similitud[indice])), reverse=True, key=lambda x: x[1])
+
+    # for i in distancia[1:6]:
+    #     print(modelo_dataset.iloc[i[0]].title)
+    return [modelo_dataset.iloc[i[0]].title for i in distancia[1:6]]
