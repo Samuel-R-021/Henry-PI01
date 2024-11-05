@@ -74,7 +74,7 @@ async def recomendacion(titulo: str = ''):
     
     cv = CountVectorizer(max_features=5000, stop_words='english')
     vector = cv.fit_transform(modelo_dataset['tags']).toarray()
-    similitud = cosine_similarity(vector)
+    # similitud = cosine_similarity(vector)
 
     # indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
 
