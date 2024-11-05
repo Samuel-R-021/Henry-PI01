@@ -37,11 +37,15 @@ async def cantidad_filmaciones_dia(dia: str = ''):
 @app.get("/score_titulo/")
 async def score_titulo(titulo_de_la_filmacion: str = ''):
     indice = titulo_de_la_filmacion.lower()
+    if indice not in func_1_4_dataset.index:
+       return 'La pelicula no esta en la base de datos'
     return f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]} con un score/popularidad de {func_1_4_dataset['popularity'][indice]}"
     
 @app.get("/votos_titulo/")
 async def votos_titulo(titulo_de_la_filmacion: str = ''):
     indice = titulo_de_la_filmacion.lower()
+    if indice not in func_1_4_dataset.index:
+       return 'La pelicula no esta en la base de datos'
     return f"La película {func_1_4_dataset['title'][indice]} tiene menos de 2000 valoraciones, por lo que no se devuelve ningun valor." if func_1_4_dataset['vote_count'][indice] < 2000 else f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]}. La misma cuenta con un total de {int(func_1_4_dataset['vote_count'][indice])} valoraciones, con un promedio de {func_1_4_dataset['vote_average'][indice]}"
 
 @app.get("/get_actor/")
@@ -50,6 +54,8 @@ async def get_actor(nombre_actor: str = ''):
     # convertir a minuscula para evitar errores, y usar como indice en el cast_dataset
     indice = nombre_actor.lower()
 
+    if indice not in cast_dataset.index:
+       return 'El actor no esta en la base de datos'
     # aqui tomamos los id sacados de cast_dataset y buscamos cuales se encuentran en el dataset de movies (func_5_6_dataset)
     # y nos quedamos solo con los que SI estan en el datasets de movies.
     movies_cast_id_match = func_5_6_dataset['id'].isin(cast_dataset['id'][indice])
@@ -64,7 +70,8 @@ async def get_actor(nombre_actor: str = ''):
 @app.get("/get_director/")
 async def get_director(nombre_actor: str = ''):
     indice = nombre_actor.lower()
-    
+    if indice not in crew_dataset.index:
+       return 'El director no esta en la base de datos'
     movies_crew_id_match = func_5_6_dataset['id'].isin(crew_dataset['id'][indice])
     nombre = crew_dataset['name'][indice][0]
     filmaciones = func_5_6_dataset['id'][movies_crew_id_match]
@@ -74,14 +81,14 @@ async def get_director(nombre_actor: str = ''):
 
 @app.get("/recomendacion/")
 async def recomendacion(titulo: str = ''):
-    if titulo in modelo_dataset['title']:
+    if titulo not in modelo_dataset['title'].tolist():
+        return f'Hay algun error en el nombre introducido ({titulo}, considere mayúsculas) o la película no se encuentra en la base de datos'
         
-        cv = CountVectorizer(max_features=1250, stop_words='english')
-        vector = cv.fit_transform(modelo_dataset['tags']).toarray()
-        similitud = cosine_similarity(vector)
+    cv = CountVectorizer(max_features=1250, stop_words='english')
+    vector = cv.fit_transform(modelo_dataset['tags']).toarray()
+    similitud = cosine_similarity(vector)
 
-        indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
-        distancia = sorted(list(enumerate(similitud[indice])), reverse=True, key=lambda x: x[1])
+    indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
+    distancia = sorted(list(enumerate(similitud[indice])), reverse=True, key=lambda x: x[1])
 
-        return [modelo_dataset['title'][i[0]] for i in distancia[1:6]]
-    return f'Hay algun error en el nombre introducido ({titulo}, considere mayúsculas) o la película no se encuentra en la base de datos'
+    return [modelo_dataset['title'][i[0]] for i in distancia[1:6]]
