@@ -76,10 +76,12 @@ async def recomendacion(titulo: str = ''):
     vector = cv.fit_transform(modelo_dataset['tags']).toarray()
     similitud = cosine_similarity(vector)
 
-    indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
+    # indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
 
-    distancia = sorted(list(enumerate(similitud[indice])), reverse=True, key=lambda x: x[1])
+    # distancia = sorted(list(enumerate(similitud[indice])), reverse=True, key=lambda x: x[1])
 
     # for i in distancia[1:6]:
     #     print(modelo_dataset.iloc[i[0]].title)
-    return [modelo_dataset.iloc[i[0]].title for i in distancia[1:6]]
+    # probando
+    # return [modelo_dataset.iloc[i[0]].title for i in distancia[1:6]]
+    return vector
