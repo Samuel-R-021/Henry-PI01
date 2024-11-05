@@ -75,7 +75,7 @@ async def get_director(nombre_actor: str = ''):
 @app.get("/recomendacion/")
 async def recomendacion(titulo: str = ''):
     if titulo not in modelo_dataset['title']:
-        return f'Hay algun error en el nombre introducido ("{titulo}", considere mayúsculas) o la película no se encuentra en la base de datos'
+        return f'Hay algun error en el nombre introducido (\"{titulo}\", considere mayúsculas) o la película no se encuentra en la base de datos'
     
     
     cv = CountVectorizer(max_features=1250, stop_words='english')
