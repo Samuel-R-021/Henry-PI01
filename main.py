@@ -69,7 +69,7 @@ async def get_director(nombre_actor: str = ''):
     promedio = retorno/filmaciones.shape[0]
     return f"El director {nombre} ha dirigido {filmaciones.shape[0]} filmaciones, con un retorno total de {round(retorno,ndigits=2)}, siendo un promedio de {round(promedio, ndigits=2)} por filmacion."
 
-@app.get("/recomendacion/", debug= True)
+@app.get("/recomendacion/")
 async def recomendacion(titulo: str = ''):
     
     cv = CountVectorizer(max_features=5000, stop_words='english')
