@@ -11,7 +11,7 @@ cast_dataset = pd.read_csv('cast_credits.csv',index_col='lowercase_name')
 crew_dataset = pd.read_csv('crew_credits.csv',index_col='lowercase_name')
 modelo_dataset = pd.read_csv('modelo_database.csv')
 
-cv = CountVectorizer(max_features=5000, stop_words='english')
+cv = CountVectorizer(max_features=500, stop_words='english')
 vector = cv.fit_transform(modelo_dataset['tags']).toarray()
 similitud = cosine_similarity(vector)
 
@@ -81,5 +81,5 @@ async def recomendacion(titulo: str = ''):
 
     for i in distancia[1:6]:
         print(modelo_dataset.iloc[i[0]].title)
-        
+
     return [modelo_dataset.iloc[i[0]].title for i in distancia[1:6]]
