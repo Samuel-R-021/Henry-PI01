@@ -74,15 +74,14 @@ async def get_director(nombre_actor: str = ''):
 
 @app.get("/recomendacion/")
 async def recomendacion(titulo: str = ''):
-    if titulo not in modelo_dataset['title']:
-        return f'Hay algun error en el nombre introducido (\"{titulo}\", considere mayúsculas) o la película no se encuentra en la base de datos'
-    
-    
-    cv = CountVectorizer(max_features=1250, stop_words='english')
-    vector = cv.fit_transform(modelo_dataset['tags']).toarray()
-    similitud = cosine_similarity(vector)
+    if titulo in modelo_dataset['title']:
+        
+        cv = CountVectorizer(max_features=1250, stop_words='english')
+        vector = cv.fit_transform(modelo_dataset['tags']).toarray()
+        similitud = cosine_similarity(vector)
 
-    indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
-    distancia = sorted(list(enumerate(similitud[indice])), reverse=True, key=lambda x: x[1])
+        indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
+        distancia = sorted(list(enumerate(similitud[indice])), reverse=True, key=lambda x: x[1])
 
-    return [modelo_dataset['title'][i[0]] for i in distancia[1:6]]
+        return [modelo_dataset['title'][i[0]] for i in distancia[1:6]]
+    return f'Hay algun error en el nombre introducido ({titulo}, considere mayúsculas) o la película no se encuentra en la base de datos'
