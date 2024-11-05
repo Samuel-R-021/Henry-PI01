@@ -13,7 +13,7 @@ modelo_dataset = pd.read_csv('modelo_database.csv')
 
 @app.get("/")
 async def root():
-    return {"message": "Proyecto Individual 1 DataScience, Samuel Rangel DataPT11"}
+    return {"Mensaje": "Proyecto Individual 1 DataScience, Samuel Rangel DataPT11"}
 
 @app.get("/cantidad_filmaciones_mes/")
 async def cantidad_filmaciones_mes(mes: str = ''):
@@ -74,6 +74,9 @@ async def get_director(nombre_actor: str = ''):
 
 @app.get("/recomendacion/")
 async def recomendacion(titulo: str = ''):
+    if titulo not in modelo_dataset['title']:
+        return f'Hay algun error en el nombre introducido ("{titulo}", considere mayúsculas) o la película no se encuentra en la base de datos'
+    
     
     cv = CountVectorizer(max_features=1250, stop_words='english')
     vector = cv.fit_transform(modelo_dataset['tags']).toarray()
