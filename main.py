@@ -84,4 +84,4 @@ async def recomendacion(titulo: str = ''):
     #     print(modelo_dataset.iloc[i[0]].title)
     # probando
     # return [modelo_dataset.iloc[i[0]].title for i in distancia[1:6]]
-    return vector
+    return vector.shape
