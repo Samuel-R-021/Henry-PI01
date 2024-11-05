@@ -11,9 +11,9 @@ cast_dataset = pd.read_csv('cast_credits.csv',index_col='lowercase_name')
 crew_dataset = pd.read_csv('crew_credits.csv',index_col='lowercase_name')
 modelo_dataset = pd.read_csv('modelo_database.csv')
 
-cv = CountVectorizer(max_features=3500, stop_words='english')
-vector = cv.fit_transform(modelo_dataset['tags']).toarray()
-similitud = cosine_similarity(vector)
+# cv = CountVectorizer(max_features=3500, stop_words='english')
+# vector = cv.fit_transform(modelo_dataset['tags']).toarray()
+# similitud = cosine_similarity(vector)
 
 @app.get("/cantidad_filmaciones_mes/")
 async def cantidad_filmaciones_mes(mes: str = ''):
@@ -72,9 +72,9 @@ async def get_director(nombre_actor: str = ''):
 @app.get("/recomendacion/")
 async def recomendacion(titulo: str = ''):
     
-    # cv = CountVectorizer(stop_words='english')
-    # vector = cv.fit_transform(modelo_dataset['tags']).toarray()
-    # similitud = cosine_similarity(vector)
+    cv = CountVectorizer(stop_words='english')
+    vector = cv.fit_transform(modelo_dataset['tags']).toarray()
+    similitud = cosine_similarity(vector)
 
     indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
 
