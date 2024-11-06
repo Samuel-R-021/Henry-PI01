@@ -13,21 +13,21 @@ cast_dataset = pd.read_csv('cast_credits.csv',index_col='lowercase_name')
 crew_dataset = pd.read_csv('crew_credits.csv',index_col='lowercase_name')
 modelo_dataset = pd.read_csv('modelo_database.csv')
 
-class Resumen(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
-
 class Exito_Individual(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+    nombre: str | None = None
+    fecha_lanzamiento: str | None = None
+    retorno: float | None = None
+    costo: float | None = None
+    ganancia: float | None = None
+class Resumen(BaseModel):
+    director: str | None = None
+    retorno_total: float | None = None
+    retorno_promedio: float | None = None
+    peliculas: list[Exito_Individual] | None = None
 
 @app.get("/")
 async def root():
-    return {"Mensaje": "Proyecto Individual 1 DataScience, Samuel Rangel DataPT11"}
+    return {"mensaje": "Proyecto Individual 1 DataScience, Samuel Rangel DataPT11"}
 
 @app.get("/cantidad_filmaciones_mes/")
 async def cantidad_filmaciones_mes(mes: str = ''):
@@ -100,10 +100,10 @@ async def get_actor(nombre_actor: str = ''):
     return f"El actor {nombre} ha participado en {filmaciones} filmaciones, el mismo ha conseguido un retorno de {round(retorno,ndigits=2)} con un promedio de {round(promedio, ndigits=2)} por filmacion."
 
 @app.get("/get_director/")
-async def get_director(nombre_actor: str = ''):
+async def get_director(nombre_director: str = ''):
 
     # Se convierte a minuscula para evitar errores, y usar como indice en el crew_dataset
-    indice = nombre_actor.lower()
+    indice = nombre_director.lower()
 
     # se chequea si el actor aparece como indice en el dataset, de no ser asi regresa el mensaje de error
     if indice not in crew_dataset.index:
@@ -119,7 +119,32 @@ async def get_director(nombre_actor: str = ''):
     filmaciones = func_5_6_dataset['id'][movies_crew_id_match]
     retorno = func_5_6_dataset['return'][movies_crew_id_match].sum()
     promedio = retorno/filmaciones.shape[0]
-    return f"El director {nombre} ha dirigido {filmaciones.shape[0]} filmaciones, con un retorno total de {round(retorno,ndigits=2)}, siendo un promedio de {round(promedio, ndigits=2)} por filmacion."
+
+    resumen = Resumen
+    resumen.director = nombre
+    resumen.retorno_total = retorno
+    resumen.retorno_promedio = promedio
+
+    # class Exito_Individual(BaseModel):
+    # nombre: str | None = None
+    # fecha_lanzamiento: str | None = None
+    # retorno: float | None = None
+    # costo: float | None = None
+    # ganancia: float | None = None
+
+    lista_filmaciones = []
+    director_films = pd.read_csv('funciones_5_6_dataset.csv', index_col='id')
+    for filmacion in filmaciones:
+        film = Exito_Individual
+        film.nombre = director_films['title'][filmacion]
+        film.fecha_lanzamiento = director_films['release_date'][filmacion]
+        film.retorno = director_films['revenue'][filmacion]
+        film.costo = director_films['budget'][filmacion]
+        film.ganancia = director_films['return'][filmacion]
+
+        lista_filmaciones.append(film)
+
+    return {'resumen': resumen, "peliculas": lista_filmaciones}
 
 @app.get("/recomendacion/")
 async def recomendacion(titulo: str = ''):
