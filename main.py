@@ -13,14 +13,17 @@ cast_dataset = pd.read_csv('cast_credits.csv',index_col='lowercase_name')
 crew_dataset = pd.read_csv('crew_credits.csv',index_col='lowercase_name')
 modelo_dataset = pd.read_csv('modelo_database.csv')
 
+# Clases para la funcion get_director
 class Exito_Individual(BaseModel):
     nombre: str | None = None
     fecha_lanzamiento: str | None = None
     retorno: float | None = None
     costo: float | None = None
     ganancia: float | None = None
+
 class Resumen(BaseModel):
     director: str | None = None
+    total_peliculas: int | None = None
     retorno_total: float | None = None
     retorno_promedio: float | None = None
     peliculas: list[Exito_Individual] | None = None
@@ -33,9 +36,9 @@ async def root():
 async def cantidad_filmaciones_mes(mes: str = ''):
     
     # En el dataset todos los meses inician con mayuscula, por ello se usa .capitalize(), para garantizar el match.
-
     if mes.capitalize() not in {'Enero','Febrero', 'Marzo','Abril','Mayo', 'Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'}:
         return 'Por favor ingrese un mes valido en español'
+    
     # Se extrae un dataframe mas pequeño donde los meses son igual al input, y se cuenta el numero de filas
     total = func_1_4_dataset['month_name'][func_1_4_dataset['month_name']== mes.capitalize()].count()
     return f'{total} películas fueron estrenadas en el mes de {mes.lower()}'
@@ -44,14 +47,12 @@ async def cantidad_filmaciones_mes(mes: str = ''):
 async def cantidad_filmaciones_dia(dia: str = ''):
 
     # Se acepta los inputs aun si no tienen acentos correctamente.
-
     if dia.lower() == 'miercoles':
         dia = 'miércoles'
     elif dia.lower() == 'sabado':
         dia = 'sábado'
 
     # En el dataset los dias de la semana inician con mayuscula, por ello se usa .capitalize(), para garantizar el match.
-
     if dia.capitalize() not in {'Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'}:
         return 'Por favor ingrese un dia de la semana valido en español'
     
@@ -64,8 +65,10 @@ async def score_titulo(titulo_de_la_filmacion: str = ''):
 
     # Para buscar la pelicula, al abrir el dataset, se coloca la columna de titulo como indice, para facilitar la busqueda.
     indice = titulo_de_la_filmacion.lower()
+
     if indice not in func_1_4_dataset.index:
        return 'Hay algun error en el nombre introducido (considere mayúsculas) o la película no se encuentra en la base de datos'
+    
     return f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]} con un score/popularidad de {func_1_4_dataset['popularity'][indice]}"
     
 @app.get("/votos_titulo/")
@@ -73,8 +76,10 @@ async def votos_titulo(titulo_de_la_filmacion: str = ''):
 
     # Para buscar la pelicula, al abrir el dataset, se coloca la columna de titulo como indice, para facilitar la busqueda.
     indice = titulo_de_la_filmacion.lower()
+
     if indice not in func_1_4_dataset.index:
        return 'Hay algun error en el nombre introducido (considere mayúsculas) o la película no se encuentra en la base de datos'
+    
     return f"La película {func_1_4_dataset['title'][indice]} tiene menos de 2000 valoraciones, por lo que no se devuelve ningun valor." if func_1_4_dataset['vote_count'][indice] < 2000 else f"La película {func_1_4_dataset['title'][indice]} fue estrenada en el año {func_1_4_dataset['release_year'][indice]}. La misma cuenta con un total de {int(func_1_4_dataset['vote_count'][indice])} valoraciones, con un promedio de {func_1_4_dataset['vote_average'][indice]}"
 
 @app.get("/get_actor/")
@@ -97,6 +102,7 @@ async def get_actor(nombre_actor: str = ''):
     filmaciones = func_5_6_dataset['id'][movies_cast_id_match].shape[0]
     retorno = func_5_6_dataset['return'][movies_cast_id_match].sum()
     promedio = retorno/filmaciones
+
     return f"El actor {nombre} ha participado en {filmaciones} filmaciones, el mismo ha conseguido un retorno de {round(retorno,ndigits=2)} con un promedio de {round(promedio, ndigits=2)} por filmacion."
 
 @app.get("/get_director/")
@@ -115,24 +121,19 @@ async def get_director(nombre_director: str = ''):
     movies_crew_id_match = func_5_6_dataset['id'].isin(crew_dataset['id'][indice])
 
     # valores a extraer de ambos datasets para el resultado de la funcion
-    nombre = crew_dataset['name'][indice][0]
     filmaciones = func_5_6_dataset['id'][movies_crew_id_match]
     retorno = func_5_6_dataset['return'][movies_crew_id_match].sum()
-    promedio = retorno/filmaciones.shape[0]
 
+    # substituyendo los valores en objeto Resumen()
     resumen = Resumen()
-    resumen.director = nombre
+    resumen.director = crew_dataset['name'][indice][0]
     resumen.retorno_total = retorno
-    resumen.retorno_promedio = promedio
+    resumen.retorno_promedio = retorno/filmaciones.shape[0]
 
-    # class Exito_Individual(BaseModel):
-    # nombre: str | None = None
-    # fecha_lanzamiento: str | None = None
-    # retorno: float | None = None
-    # costo: float | None = None
-    # ganancia: float | None = None
-
+    # lista vacia que sera llenada
     lista_filmaciones = []
+
+    # df que permitira buscar y añadir la info de cada pelicula individual facilmente
     director_films = pd.read_csv('funciones_5_6_dataset.csv', index_col='id')
     for filmacion in filmaciones:
         film = Exito_Individual()
@@ -143,8 +144,11 @@ async def get_director(nombre_director: str = ''):
         film.ganancia = director_films['return'][filmacion]
 
         lista_filmaciones.append(film)
+    
+    resumen.peliculas = lista_filmaciones
+    resumen.total_peliculas = len(lista_filmaciones)
 
-    return {'resumen': resumen, "peliculas": lista_filmaciones}
+    return {'resumen': resumen}
 
 @app.get("/recomendacion/")
 async def recomendacion(titulo: str = ''):
