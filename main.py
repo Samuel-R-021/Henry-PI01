@@ -120,7 +120,7 @@ async def get_director(nombre_director: str = ''):
     retorno = func_5_6_dataset['return'][movies_crew_id_match].sum()
     promedio = retorno/filmaciones.shape[0]
 
-    resumen = Resumen
+    resumen = Resumen()
     resumen.director = nombre
     resumen.retorno_total = retorno
     resumen.retorno_promedio = promedio
@@ -135,7 +135,7 @@ async def get_director(nombre_director: str = ''):
     lista_filmaciones = []
     director_films = pd.read_csv('funciones_5_6_dataset.csv', index_col='id')
     for filmacion in filmaciones:
-        film = Exito_Individual
+        film = Exito_Individual()
         film.nombre = director_films['title'][filmacion]
         film.fecha_lanzamiento = director_films['release_date'][filmacion]
         film.retorno = director_films['revenue'][filmacion]
