@@ -30,10 +30,20 @@ class Resumen(BaseModel):
 
 @app.get("/")
 async def root():
+    """
+Returns a welcome message for the root endpoint of the application.
+
+This asynchronous function handles GET requests to the root URL and returns a JSON response containing a message about the project and the author.
+
+Returns:
+    dict: A dictionary containing the welcome message.
+"""
+
     return {"mensaje": "Proyecto Individual 1 DataScience, Samuel Rangel DataPT11"}
 
 @app.get("/cantidad_filmaciones_mes/")
 async def cantidad_filmaciones_mes(mes: str = ''):
+
     
     # En el dataset todos los meses inician con mayuscula, por ello se usa .capitalize(), para garantizar el match.
     if mes.capitalize() not in {'Enero','Febrero', 'Marzo','Abril','Mayo', 'Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'}:
@@ -45,13 +55,22 @@ async def cantidad_filmaciones_mes(mes: str = ''):
 
 @app.get("/cantidad_filmaciones_dia/")
 async def cantidad_filmaciones_dia(dia: str = ''):
+    """
+Counts the number of films released on a specified day of the week.
 
+This asynchronous function processes a day input, normalizing it for proper matching against a dataset of film releases. It returns the total count of films released on that day, ensuring the input is valid and formatted correctly.
+
+Args:
+    dia (str): The day of the week in Spanish for which to count film releases. Defaults to an empty string.
+
+Returns:
+    str: A message indicating the number of films released on the specified day, or an error message if the input is invalid.
+    """
     # Se acepta los inputs aun si no tienen acentos correctamente.
     if dia.lower() == 'miercoles':
         dia = 'miércoles'
     elif dia.lower() == 'sabado':
         dia = 'sábado'
-
     # En el dataset los dias de la semana inician con mayuscula, por ello se usa .capitalize(), para garantizar el match.
     if dia.capitalize() not in {'Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'}:
         return 'Por favor ingrese un dia de la semana valido en español'
@@ -73,6 +92,18 @@ async def score_titulo(titulo_de_la_filmacion: str = ''):
     
 @app.get("/votos_titulo/")
 async def votos_titulo(titulo_de_la_filmacion: str = ''):
+    """
+Retrieves voting information for a specified film title.
+
+This asynchronous function checks the provided film title against a dataset and returns relevant voting details, including the number of votes and the release year. If the film has fewer than 2000 votes, a specific message is returned; otherwise, detailed voting information is provided.
+
+Args:
+    titulo_de_la_filmacion (str): The title of the film for which to retrieve voting information. Defaults to an empty string.
+
+Returns:
+    str: A message containing the voting information for the specified film or an error message if the title is invalid or not found.
+"""
+
 
     # Para buscar la pelicula, al abrir el dataset, se coloca la columna de titulo como indice, para facilitar la busqueda.
     indice = titulo_de_la_filmacion.lower()
@@ -84,6 +115,17 @@ async def votos_titulo(titulo_de_la_filmacion: str = ''):
 
 @app.get("/get_actor/")
 async def get_actor(nombre_actor: str = ''):
+    """
+Retrieves film participation and financial return information for a specified actor.
+
+This asynchronous function checks the provided actor's name against a dataset and returns the number of films they have participated in, along with the total financial return and average return per film. If the actor is not found in the dataset, an error message is returned.
+
+Args:
+    nombre_actor (str): The name of the actor for whom to retrieve film and return information. Defaults to an empty string.
+
+Returns:
+    str: A message containing the actor's film participation details and financial return, or an error message if the actor is not found.
+"""
     
     # Se convierte a minuscula para evitar errores, y usar como indice en el cast_dataset
     indice = nombre_actor.lower()
@@ -173,5 +215,16 @@ async def recomendacion(titulo: str = ''):
     # con el indice se extrae la fila de la pelicula y toda su semejanza con el resto de peliculas, ordenando de mayor a menor
     distancia = sorted(list(enumerate(similitud[indice])), reverse=True, key=lambda x: x[1])
 
-    # se extrae del 2do al 6 valor (el primero es la pelicula ingresada)
+    """
+Extracts specific values from a list, starting from the second to the sixth element.
+
+This function processes a list of values, omitting the first element, which is assumed to be a movie title. It retrieves and returns the specified range of values for further use.
+
+Args:
+    values (list): A list containing movie-related data, where the first element is the movie title.
+
+Returns:
+    list: A list containing the extracted values from the second to the sixth position.
+"""
+
     return [modelo_dataset['title'][i[0]] for i in distancia[1:6]]
