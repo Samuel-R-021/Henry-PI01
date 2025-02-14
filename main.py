@@ -28,6 +28,16 @@ class Resumen(BaseModel):
     retorno_promedio: float | None = None
     peliculas: list[Exito_Individual] | None = None
 
+# instanciar el vectorizador para fijar los parametros, en este caso limite de atributos (palabras) y remover palabras no relevantes
+cv = CountVectorizer(max_features=1250, stop_words='english')
+
+# la transformacion hace que tengamos tantas columnas como palabras diferentes y ver cuales aparecen
+# aqui la cantidad de palabras diferentes son 1250 pq fue el limite puesto al vectorizador
+vector = cv.fit_transform(modelo_dataset['tags']).toarray()
+
+# la funcion calcula la semejanza entre cada registro con el resto de los registros
+similitud = cosine_similarity(vector)
+
 @app.get("/")
 async def root():
     """
@@ -198,16 +208,6 @@ async def recomendacion(titulo: str = ''):
     # Se chequea que la pelicula esta en el dataset, de no ser asi regresa mensaje de error
     if titulo not in modelo_dataset['title'].tolist():
         return 'Hay algun error en el nombre introducido (considere mayúsculas) o la película no se encuentra en la base de datos'
-    
-    # instanciar el vectorizador para fijar los parametros, en este caso limite de atributos (palabras) y remover palabras no relevantes
-    cv = CountVectorizer(max_features=1250, stop_words='english')
-
-    # la transformacion hace que tengamos tantas columnas como palabras diferentes y ver cuales aparecen
-    # aqui la cantidad de palabras diferentes son 1250 pq fue el limite puesto al vectorizador
-    vector = cv.fit_transform(modelo_dataset['tags']).toarray()
-
-    # la funcion calcula la semejanza entre cada registro con el resto de los registros
-    similitud = cosine_similarity(vector)
 
     # se busca el indice correspondiente a la pelicula que se ingreso
     indice = modelo_dataset[modelo_dataset['title']== titulo].index[0]
