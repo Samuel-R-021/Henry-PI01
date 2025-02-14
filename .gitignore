@@ -1,6 +1,8 @@
 /venv
 venv
 venv/
+__pycache__
+.venv
 
 movies_dataset.csv
 credits.csv
