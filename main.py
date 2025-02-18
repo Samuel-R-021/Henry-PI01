@@ -7,11 +7,11 @@ from pydantic import BaseModel
 app = FastAPI()
 
 # donde esta index_col=, se hizo para escoger dicha columna como indice para simplificar las correspondientes busquedas
-func_1_4_dataset = pd.read_csv('funciones_1_4_dataset.csv', index_col='lowercase_title')
-func_5_6_dataset = pd.read_csv('funciones_5_6_dataset.csv')
-cast_dataset = pd.read_csv('cast_credits.csv',index_col='lowercase_name') 
-crew_dataset = pd.read_csv('crew_credits.csv',index_col='lowercase_name')
-modelo_dataset = pd.read_csv('modelo_database.csv')
+func_1_4_dataset = pd.read_csv('Datasets/funciones_1_4_dataset.csv', index_col='lowercase_title')
+func_5_6_dataset = pd.read_csv('Datasets/funciones_5_6_dataset.csv')
+cast_dataset = pd.read_csv('Datasets/cast_credits.csv',index_col='lowercase_name') 
+crew_dataset = pd.read_csv('Datasets/crew_credits.csv',index_col='lowercase_name')
+modelo_dataset = pd.read_csv('Datasets/modelo_database.csv')
 
 # Clases para la funcion get_director
 class Exito_Individual(BaseModel):
